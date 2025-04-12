@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Savvy Track</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gradient-to-r from-blue-100 to-blue-200 min-h-screen flex items-center justify-center flex-col">
+
+  <!-- Welcome Page -->
+  <div class="text-center p-8 bg-white rounded-3xl shadow-2xl max-w-md w-full" id="welcomeSection">
+    <h1 class="text-3xl font-semibold text-gray-700 mb-2">Welcome to</h1>
+    <h2 class="text-5xl font-bold text-blue-800 mb-4 tracking-wide">Savvy Track</h2>
+    <p class="text-gray-700 mb-6">Your smart personal finance manager.<br>Plan. Track. Save. Grow.</p>
+    <div class="flex flex-col space-y-4">
+      <button onclick="showSection('newUserSection')" class="w-full px-6 py-3 bg-green-600 text-white text-lg rounded-xl hover:bg-green-700 transition-all duration-300">New User</button>
+      <button onclick="showSection('existingUserSection')" class="w-full px-6 py-3 bg-blue-600 text-white text-lg rounded-xl hover:bg-blue-700 transition-all duration-300">Existing User</button>
+    </div>
+  </div>
+
+  <!-- New User Section -->
+  <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md hidden" id="newUserSection">
+    <h2 id="formTitle" class="text-3xl font-bold text-blue-700 mb-6 text-center">Create Account</h2>
+    <form id="registrationForm" class="space-y-4">
+      <input type="text" name="name" placeholder="Full Name" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+      <input type="email" name="email" placeholder="Email Address" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+      <input type="tel" name="phone" placeholder="Phone Number" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+      <input type="password" name="password" placeholder="Create Password" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+      <input type="password" name="retype_password" placeholder="Retype Password" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+      <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition">Register</button>
+    </form>
+    <p id="successMessage" class="text-green-600 text-xl text-center mt-6 hidden font-semibold">🎉 Your registration has been completed successfully!</p>
+  </div>
+
+  <!-- Existing User Section -->
+  <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md hidden" id="existingUserSection">
+    <h2 class="text-3xl font-bold text-blue-700 mb-6 text-center">Welcome Back</h2>
+    <form id="loginForm" class="space-y-4">
+      <input type="text" name="identifier" placeholder="Email or Phone Number" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+      <input type="password" name="password" placeholder="Password" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+      <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">Login</button>
+    </form>
+    <p id="loginMessage" class="text-green-600 text-center mt-4 hidden font-medium">✅ Login successful!</p>
+  </div>
+
+  <!-- Financial Category Page -->
+  <div id="categoryPage" class="hidden text-center p-8 bg-white rounded-3xl shadow-2xl max-w-xl w-full flex-col items-center">
+    <h1 class="text-4xl font-bold text-gray-700 mb-6">Select Your Financial Category</h1>
+    <div class="flex flex-col space-y-4">
+      <button class="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700" onclick="showSection('budgetPlanner')">Young Adults & Students</button>
+      <button class="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700" onclick="showSection('budgetPlanner')">Working Professionals</button>
+      <button class="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700" onclick="showSection('budgetPlanner')">Irregular Income People</button>
+    </div>
+  </div>
+
+  <!-- Budget Planner -->
+  <div id="budgetPlanner" class="hidden text-center p-8 bg-white rounded-3xl shadow-2xl max-w-md w-full">
+    <h1 class="text-3xl font-semibold text-gray-700 mb-2">Budget Planner</h1>
+    <p class="text-gray-700 mb-6">Enter your income and savings, then add your expenses.</p>
+
+    <!-- Income & Savings Form -->
+    <form id="initialForm" class="space-y-4 mb-6">
+      <input type="number" id="income" placeholder="Monthly Income" class="w-full p-3 border rounded-lg" required>
+      <input type="number" id="savings" placeholder="Desired Savings" class="w-full p-3 border rounded-lg" required>
+      <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">Next</button>
+    </form>
+
+    <!-- Expense Inputs -->
+    <form id="expensesForm" class="space-y-4 hidden">
+      <div id="expenseInputs"></div>
+      <button type="button" id="addExpense" class="w-full bg-gray-300 text-gray-800 py-2 rounded-lg hover:bg-gray-400">Add Another Expense</button>
+      <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition mt-2">Generate Pie Chart</button>
+    </form>
+
+    <p id="budgetStatus" class="mt-4 text-gray-700"></p>
+
+    <!-- Pie Chart -->
+    <div class="mt-8 hidden" id="pieChartSection">
+      <h2 class="text-2xl font-semibold text-gray-700 mb-4">Your Budget Pie Chart</h2>
+      <canvas id="budgetPieChart" style="max-width: 400px;"></canvas>
+    </div>
+
+    <!-- Logout Button (Initially Hidden) -->
+    <button id="logoutBtn" onclick="logout()" class="w-full mt-6 bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition hidden">Logout</button>
+  </div>
+
+  <!-- Script Section -->
+  <script>
+    function showSection(sectionId) {
+      const sections = ['welcomeSection', 'newUserSection', 'existingUserSection', 'categoryPage', 'budgetPlanner'];
+      sections.forEach(id => document.getElementById(id).classList.add('hidden'));
+      document.getElementById(sectionId).classList.remove('hidden');
+    }
+
+    function logout() {
+      // Hide current sections and show the Welcome Page
+      const sections = ['newUserSection', 'existingUserSection', 'categoryPage', 'budgetPlanner'];
+      sections.forEach(id => document.getElementById(id).classList.add('hidden'));
+      showSection('welcomeSection');
+    }
+
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      document.getElementById('registrationForm').classList.add('hidden');
+      document.getElementById('formTitle').classList.add('hidden');
+      document.getElementById('successMessage').classList.remove('hidden');
+      setTimeout(() => showSection('categoryPage'), 1500);
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      document.getElementById('loginForm').classList.add('hidden');
+      document.getElementById('loginMessage').classList.remove('hidden');
+      setTimeout(() => showSection('categoryPage'), 1500);
+    });
+
+    // Budget Planner Script
+    const initialForm = document.getElementById('initialForm');
+    const expensesForm = document.getElementById('expensesForm');
+    const expenseInputs = document.getElementById('expenseInputs');
+    const addExpense = document.getElementById('addExpense');
+    const budgetStatus = document.getElementById('budgetStatus');
+    const pieChartSection = document.getElementById('pieChartSection');
+    const pieChartContainer = document.getElementById('budgetPieChart');
+
+    let income = 0;
+    let savings = 0;
+    let chartInstance = null;
+
+    const allowedRanges = {
+      rent: [3000, 3500],
+      food: [5000, 6000],
+      travel: [3000, 5000],
+      medical: [2000, 5000]
+    };
+
+    initialForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      income = parseFloat(document.getElementById('income').value);
+      savings = parseFloat(document.getElementById('savings').value);
+
+      if (savings > income) {
+        alert("Savings cannot be more than income.");
+        return;
+      }
+
+      initialForm.classList.add('hidden');
+      expensesForm.classList.remove('hidden');
+      addExpenseInput();
+    });
+
+    addExpense.addEventListener('click', addExpenseInput);
+
+    function addExpenseInput() {
+      const div = document.createElement('div');
+      div.classList.add('flex', 'gap-2');
+      div.innerHTML = `
+        <input type="text" placeholder="Expense Name" class="expense-name w-1/2 p-2 border rounded" required>
+        <input type="number" placeholder="Amount" class="expense-amount w-1/2 p-2 border rounded" required>
+      `;
+      expenseInputs.appendChild(div);
+    }
+
+    expensesForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const names = expenseInputs.querySelectorAll('.expense-name');
+      const amounts = expenseInputs.querySelectorAll('.expense-amount');
+      const expenseNames = [], expenseAmounts = [];
+
+      for (let i = 0; i < names.length; i++) {
+        const name = names[i].value.trim().toLowerCase();
+        const amount = parseFloat(amounts[i].value);
+        if (!name || isNaN(amount)) {
+          alert("Please fill in all expense names and amounts.");
+          return;
+        }
+
+        if (allowedRanges[name]) {
+          const [min, max] = allowedRanges[name];
+          if (amount < min || amount > max) {
+            alert(`${name.charAt(0).toUpperCase() + name.slice(1)} must be between ₹${min} and ₹${max}`);
+            return;
+          }
+        }
+
+        expenseNames.push(name);
+        expenseAmounts.push(amount);
+      }
+
+      const totalExpenses = expenseAmounts.reduce((sum, val) => sum + val, 0);
+      const remaining = income - savings;
+
+      if (totalExpenses > remaining) {
+        alert("Total expenses exceed available budget after savings.");
+        return;
+      }
+
+      const labels = ['Savings', ...expenseNames];
+      const data = [savings, ...expenseAmounts];
+
+      budgetStatus.textContent = `Remaining Budget: ₹${remaining - totalExpenses} | Total Expenses: ₹${totalExpenses}`;
+      pieChartSection.classList.remove('hidden');
+      generatePieChart(labels, data);
+    });
+
+    function generatePieChart(labels, data) {
+      if (chartInstance) chartInstance.destroy();
+      const ctx = pieChartContainer.getContext('2d');
+      chartInstance = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: ['#66bb6a', '#42a5f5', '#ffca28', '#ef5350', '#ab47bc', '#ffa726', '#9e9e9e']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'top' },
+            tooltip: {
+              callbacks: {
+                label: function (tooltipItem) {
+                  return `${tooltipItem.label}: ₹${tooltipItem.raw.toFixed(2)}`;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // Show the logout button after the pie chart is generated
+      document.getElementById('logoutBtn').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
